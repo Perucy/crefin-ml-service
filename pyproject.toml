@@ -1,0 +1,15 @@
+[project]
+name = "crefin-ml-service"
+version = "0.1.0"
+description = "ML-powered client intelligence"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.120.3",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+    "pydantic-settings>=2.11.0",
+    "requests>=2.32.5",
+    "scikit-learn>=1.7.2",
+    "uvicorn[standard]>=0.38.0",
+]

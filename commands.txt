@@ -1,0 +1,3 @@
+activate env: source .venv/bin/activate , deactivate: deactivate
+start server: uv run uvicorn main:app --reload
+curl with pretty print: curl http://localhost:8000/health | python3 -m json.tool
