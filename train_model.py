@@ -13,6 +13,9 @@ print("=" * 60)
 print("            TRAINING PAYMENT TIME PREDICTION MODEL")
 print("=" * 60)
 
+# ========================================================================================================
+# LOAD DATA
+# ========================================================================================================
 print("Loading training data.........")
 df = pd.read_csv('data/training_data.csv')
 print(f"✅ Loaded {len(df)} invoices ")
