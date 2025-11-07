@@ -1,0 +1,271 @@
+"""
+Feature engineering for payment prediction
+Extracts client history features from invoice data
+"""
+
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+
+
+def calculate_client_history(invoices_df, reference_date_col='issue_date'):
+    """
+    For each invoice calculate features based on client's past behavior
+
+    Args: 
+        invoices_df: df with cols [client_id, issue_date, payment_days, amount]
+        reference_date_col: col to use as "current" date (usually issue date)
+
+    Returns:
+        df with engineered client history features
+    """
+
+    # sort by date to ensure chronological order
+    df = invoices_df.sort_values(reference_date_col).reset_index(drop=True)
+
+    # will store client features for each invoice
+    client_features = []
+
+    print(f"📊 Engineering features for {len(df)} invoices...")
+
+    for idx, current_invoice in df.iterrows():
+        client_id = current_invoice['client_id']
+        current_date = current_invoice[reference_date_col]
+
+        # get all past invoices of this client (before current invoice)
+        past_invoices = df[
+            (df['client_id'] == client_id) &
+            (df[reference_date_col] < current_date)
+        ]
+
+        if len(past_invoices) >= 1:
+            # client has history - calc features
+            features = {
+                # avg payment time
+                'client_avg_payment_days': past_invoices['payment_days'].mean(),
+
+                # payment consistency (lower = more consistent)
+                'client_payment_std': past_invoices['payment_days'].std() if len(past_invoices) > 1 else 0,
+
+                # late payment rate (% of invoices paid late)
+                'client_late_payment_rate': (past_invoices['payment_days'] > 30).mean(),
+
+                # total experience with this client
+                'client_total_invoices': len(past_invoices),
+
+                # recency: days since last invoice
+                'days_since_last_invoice': (current_date - past_invoices[reference_date_col].max()).days,
+
+                # amount patterns
+                'client_avg_amount': past_invoices['amount'].mean(),
+                'client_max_amount': past_invoices['amount'].max(),
+
+                # is this client improving or getting worse
+                'client_payment_trend': calculate_payment_trend(past_invoices),
+            }
+        else:
+            # new client - no history available
+            # use neutral/default values
+            features = {
+                'client_avg_payment_days': 30.0,  # Assume industry average
+                'client_payment_std': 5.0,         # Assume moderate variance
+                'client_late_payment_rate': 0.5,   # Assume 50% late (cautious)
+                'client_total_invoices': 0,        # Flag as new
+                'days_since_last_invoice': 999,    # No previous invoice
+                'client_avg_amount': current_invoice['amount'],  # Use current
+                'client_max_amount': current_invoice['amount'],
+                'client_payment_trend': 0,         # Neutral
+            }
+        
+        client_features.append(features)
+
+        # progress indicator
+        if (idx + 1) % 50 == 0:
+            print(f"   Processed {idx + 1}/{len(df)} invoices...")
+
+    features_df = pd.DataFrame(client_features)
+
+    print(f"✅ Generated {len(features_df.columns)} client history features")
+    print(f"   Features: {list(features_df.columns)}")
+    
+    return features_df
+
+
+def calculate_payment_trend(past_invoices, window=3):
+    """
+    Calculates if client is paying faster or slower over time
+
+    Returns:
+        positive number = getting worse (slower payments)
+        negative number = getting better (faster payments)
+        0 = stable
+    """
+    if len(past_invoices) < 2:
+        return 0
+    
+    # compare recent vs older payments
+    sorted_invoices = past_invoices.sort_values('issue_date')
+
+    if len(sorted_invoices) >= window * 2:
+        recent = sorted_invoices.tail(window)['payment_days'].mean()
+        older = sorted_invoices.head(window)['payment_days'].mean()  # ✅ Fixed!
+        trend = recent - older
+    else:
+        # too few data points - use simpler linear trend
+        payment_days = sorted_invoices['payment_days'].values
+        trend = payment_days[-1] - payment_days[0]
+
+    return trend
+
+
+def add_temporal_features(invoices_df, date_col='issue_date'):
+    """
+    Add time-based features (day of week, month, end-of-month etc.)
+    """
+    df = invoices_df.copy()
+
+    # extract datetime features
+    df['day_of_week'] = df[date_col].dt.dayofweek  # 0=Monday, 6=Sunday
+    df['day_of_month'] = df[date_col].dt.day
+    df['month'] = df[date_col].dt.month
+    df['quarter'] = df[date_col].dt.quarter
+
+    # business timing patterns
+    df['is_monday'] = (df['day_of_week'] == 0).astype(int)
+    df['is_friday'] = (df['day_of_week'] == 4).astype(int)
+    df['is_weekend'] = (df['day_of_week'] >= 5).astype(int)
+
+    # Month patterns
+    df['is_start_of_month'] = (df['day_of_month'] <= 5).astype(int)
+    df['is_end_of_month'] = (df['day_of_month'] >= 25).astype(int)
+    df['week_of_month'] = ((df['day_of_month'] - 1) // 7 + 1)
+
+    # Quarterly patterns
+    df['is_quarter_end'] = df['month'].isin([3, 6, 9, 12]).astype(int)
+
+    # Seasonal patterns
+    df['is_holiday_season'] = df['month'].isin([11, 12]).astype(int)
+    df['is_summer'] = df['month'].isin([6, 7, 8]).astype(int)
+
+    print(f"✅ Added 13 temporal features")
+    
+    return df
+
+
+def add_interaction_features(df):
+    """
+    Create features that combine multiple inputs
+    """
+    features = pd.DataFrame(index=df.index)
+
+    # amount relative to client's history
+    features['amount_vs_client_avg'] = df['amount'] / df['client_avg_amount']
+    features['amount_vs_client_max'] = df['amount'] / df['client_max_amount']
+
+    # risk score: high amount + unreliable client = very risky
+    features['risk_score'] = (
+        df['amount'] / 1000 *                          # normalize amount
+        df['client_late_payment_rate'] *
+        (1 / (df['client_total_invoices'] + 1))       # new clients are riskier
+    )
+
+    # reliability x amount
+    features['reliability_weighted_amount'] = (
+        df['amount'] * (1 - df['client_late_payment_rate'])
+    )
+
+    print(f'✅ Added {len(features.columns)} interaction features')
+
+    return features
+
+
+def prepare_features_for_training(invoices_df):
+    """
+    Master function: takes raw invoice data, returns ML-ready features
+
+    Args:
+        invoices_df: Raw invoice data with at least:
+                        [client_id, issue_date, amount, payment_days]
+
+    Returns:
+        X: feature matrix (DataFrame)
+        y: Target variable (payment_days)
+        feature_columns: List of feature names
+    """
+    print("=" * 60)
+    print("      PREPARING FEATURES FOR TRAINING")
+    print("=" * 60)
+
+    # ensure datetime
+    if not pd.api.types.is_datetime64_any_dtype(invoices_df['issue_date']):
+        invoices_df['issue_date'] = pd.to_datetime(invoices_df['issue_date'])
+
+    # 1. Add temporal features
+    print("\n📅 Step 1: Adding temporal features...")
+    df = add_temporal_features(invoices_df)
+
+    # 2. Calculate client history features
+    print("\n👥 Step 2: Calculating client history features...")
+    client_features = calculate_client_history(df)
+
+    # 3. combine all features
+    print("\n🔗 Step 3: Combining features...")
+    df = pd.concat([df, client_features], axis=1)
+
+    # 4. add interaction features
+    print("\n🔀 Step 4: Adding interaction features...")
+    interaction_features = add_interaction_features(df)
+    df = pd.concat([df, interaction_features], axis=1)
+
+    # 5. select feature columns for training
+    feature_columns = [
+        # basic features
+        'amount',
+        'day_of_week',
+        'month',
+
+        # temporal features
+        'is_start_of_month',
+        'is_end_of_month',
+        'is_quarter_end',
+        'is_holiday_season',
+        'week_of_month',
+        
+        # Client history features (THE IMPORTANT ONES!)
+        'client_avg_payment_days',
+        'client_payment_std',
+        'client_late_payment_rate',
+        'client_total_invoices',
+        'days_since_last_invoice',
+        'client_avg_amount',
+        'client_payment_trend',
+        
+        # Interaction features
+        'amount_vs_client_avg',
+        'risk_score',
+        'reliability_weighted_amount',
+    ]
+
+    # extract features and target
+    X = df[feature_columns]
+    y = df['payment_days']
+
+    print("\n" + "=" * 60)
+    print(f"✅ FEATURE ENGINEERING COMPLETE")
+    print("=" * 60)
+    print(f"   Total features: {len(feature_columns)}")
+    print(f"   Total samples: {len(X)}")
+    print(f"   Features: {feature_columns}")
+    print("=" * 60)
+    
+    return X, y, feature_columns
+
+
+# Export main functions
+__all__ = [
+    'prepare_features_for_training',
+    'calculate_client_history',  # ← Fixed to match function name
+    'add_temporal_features',
+    'add_interaction_features',
+    'calculate_payment_trend'
+]
