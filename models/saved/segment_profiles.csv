@@ -1,0 +1,5 @@
+Segment ID,Name,Clients,Avg Payment (days),Consistency (std),Risk Score,Late Rate (%)
+0,Steady Medium,8,20.6,3.7,21.0,6.7
+1,Slow & Chaotic,2,40.4,8.4,68.0,92.1
+2,Steady Medium,10,23.7,5.4,28.3,15.7
+3,Slow But Predictable,10,44.0,5.1,65.5,98.4

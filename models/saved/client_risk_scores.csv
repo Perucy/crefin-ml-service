@@ -1,0 +1,31 @@
+risk_score,risk_level,risk_breakdown,recommendation,client_id,avg_payment_days,total_invoices
+18,low,"{'late_payment_risk': 10.0, 'speed_risk': 14.2, 'consistency_risk': 25.3, 'trend_risk': 50.0, 'experience_risk': 10.0}",Safe to work with. Reliable payment history.,client_0,14.25,20
+66,high,"{'late_payment_risk': 100.0, 'speed_risk': 71.8, 'consistency_risk': 18.7, 'trend_risk': 38.9, 'experience_risk': 24.0}",High risk. Require deposits or milestone payments.,client_1,45.92307692307692,13
+72,high,"{'late_payment_risk': 100.0, 'speed_risk': 73.3, 'consistency_risk': 27.0, 'trend_risk': 81.3, 'experience_risk': 14.0}",High risk. Require deposits or milestone payments.,client_10,46.666666666666664,18
+68,high,"{'late_payment_risk': 100.0, 'speed_risk': 79.6, 'consistency_risk': 22.0, 'trend_risk': 36.7, 'experience_risk': 12.0}",High risk. Require deposits or milestone payments.,client_11,49.78947368421053,19
+19,low,"{'late_payment_risk': 10.0, 'speed_risk': 15.9, 'consistency_risk': 24.8, 'trend_risk': 63.0, 'experience_risk': 14.0}",Safe to work with. Reliable payment history.,client_12,15.88888888888889,18
+15,low,"{'late_payment_risk': 10.0, 'speed_risk': 16.2, 'consistency_risk': 10.1, 'trend_risk': 53.0, 'experience_risk': 8.0}",Safe to work with. Reliable payment history.,client_13,16.19047619047619,21
+27,low,"{'late_payment_risk': 22.6, 'speed_risk': 26.7, 'consistency_risk': 25.2, 'trend_risk': 54.4, 'experience_risk': 16.0}",Safe to work with. Reliable payment history.,client_14,23.352941176470587,17
+25,low,"{'late_payment_risk': 26.4, 'speed_risk': 29.9, 'consistency_risk': 19.3, 'trend_risk': 32.2, 'experience_risk': 8.0}",Safe to work with. Reliable payment history.,client_15,24.952380952380953,21
+32,medium,"{'late_payment_risk': 31.5, 'speed_risk': 34.0, 'consistency_risk': 21.2, 'trend_risk': 63.0, 'experience_risk': 16.0}",Generally safe. Monitor payment behavior.,client_16,27.0,17
+32,medium,"{'late_payment_risk': 40.3, 'speed_risk': 36.9, 'consistency_risk': 13.9, 'trend_risk': 32.2, 'experience_risk': 16.0}",Generally safe. Monitor payment behavior.,client_17,28.470588235294116,17
+63,high,"{'late_payment_risk': 92.1, 'speed_risk': 52.4, 'consistency_risk': 35.1, 'trend_risk': 64.0, 'experience_risk': 12.0}",High risk. Require deposits or milestone payments.,client_18,36.21052631578947,19
+16,low,"{'late_payment_risk': 10.0, 'speed_risk': 16.6, 'consistency_risk': 15.8, 'trend_risk': 51.0, 'experience_risk': 8.0}",Safe to work with. Reliable payment history.,client_19,16.61904761904762,21
+16,low,"{'late_payment_risk': 10.0, 'speed_risk': 19.9, 'consistency_risk': 13.8, 'trend_risk': 36.7, 'experience_risk': 16.0}",Safe to work with. Reliable payment history.,client_2,19.88235294117647,17
+73,high,"{'late_payment_risk': 100.0, 'speed_risk': 69.3, 'consistency_risk': 45.3, 'trend_risk': 68.0, 'experience_risk': 10.0}",High risk. Require deposits or milestone payments.,client_20,44.65,20
+61,high,"{'late_payment_risk': 100.0, 'speed_risk': 69.2, 'consistency_risk': 18.1, 'trend_risk': 0.0, 'experience_risk': 14.0}",High risk. Require deposits or milestone payments.,client_21,44.611111111111114,18
+70,high,"{'late_payment_risk': 100.0, 'speed_risk': 78.2, 'consistency_risk': 21.6, 'trend_risk': 62.0, 'experience_risk': 8.0}",High risk. Require deposits or milestone payments.,client_22,49.095238095238095,21
+70,high,"{'late_payment_risk': 100.0, 'speed_risk': 80.4, 'consistency_risk': 25.3, 'trend_risk': 52.0, 'experience_risk': 8.0}",High risk. Require deposits or milestone payments.,client_23,50.95238095238095,21
+17,low,"{'late_payment_risk': 10.0, 'speed_risk': 13.9, 'consistency_risk': 18.4, 'trend_risk': 56.7, 'experience_risk': 12.0}",Safe to work with. Reliable payment history.,client_24,13.894736842105264,19
+16,low,"{'late_payment_risk': 10.0, 'speed_risk': 16.7, 'consistency_risk': 12.5, 'trend_risk': 57.0, 'experience_risk': 12.0}",Safe to work with. Reliable payment history.,client_25,16.736842105263158,19
+25,low,"{'late_payment_risk': 20.8, 'speed_risk': 20.2, 'consistency_risk': 22.2, 'trend_risk': 75.0, 'experience_risk': 12.0}",Safe to work with. Reliable payment history.,client_26,20.105263157894736,19
+32,medium,"{'late_payment_risk': 38.3, 'speed_risk': 31.9, 'consistency_risk': 18.8, 'trend_risk': 51.0, 'experience_risk': 14.0}",Generally safe. Monitor payment behavior.,client_27,25.944444444444443,18
+28,low,"{'late_payment_risk': 26.4, 'speed_risk': 33.8, 'consistency_risk': 26.7, 'trend_risk': 34.4, 'experience_risk': 8.0}",Safe to work with. Reliable payment history.,client_28,26.904761904761905,21
+30,low,"{'late_payment_risk': 33.6, 'speed_risk': 37.4, 'consistency_risk': 14.9, 'trend_risk': 43.3, 'experience_risk': 8.0}",Safe to work with. Reliable payment history.,client_29,28.714285714285715,21
+26,low,"{'late_payment_risk': 21.7, 'speed_risk': 28.3, 'consistency_risk': 17.6, 'trend_risk': 65.0, 'experience_risk': 14.0}",Safe to work with. Reliable payment history.,client_3,24.166666666666668,18
+33,medium,"{'late_payment_risk': 40.3, 'speed_risk': 35.2, 'consistency_risk': 20.5, 'trend_risk': 32.2, 'experience_risk': 16.0}",Generally safe. Monitor payment behavior.,client_4,27.58823529411765,17
+44,medium,"{'late_payment_risk': 62.9, 'speed_risk': 42.9, 'consistency_risk': 23.8, 'trend_risk': 38.9, 'experience_risk': 8.0}",Generally safe. Monitor payment behavior.,client_5,31.428571428571427,21
+53,medium,"{'late_payment_risk': 92.1, 'speed_risk': 48.5, 'consistency_risk': 20.6, 'trend_risk': 0.0, 'experience_risk': 12.0}",Moderate risk. Consider payment terms or deposits.,client_6,34.26315789473684,19
+65,high,"{'late_payment_risk': 100.0, 'speed_risk': 54.1, 'consistency_risk': 22.3, 'trend_risk': 67.0, 'experience_risk': 16.0}",High risk. Require deposits or milestone payments.,client_7,37.05882352941177,17
+65,high,"{'late_payment_risk': 100.0, 'speed_risk': 58.2, 'consistency_risk': 16.9, 'trend_risk': 67.0, 'experience_risk': 16.0}",High risk. Require deposits or milestone payments.,client_8,39.11764705882353,17
+65,high,"{'late_payment_risk': 100.0, 'speed_risk': 65.2, 'consistency_risk': 16.0, 'trend_risk': 52.0, 'experience_risk': 16.0}",High risk. Require deposits or milestone payments.,client_9,42.588235294117645,17
