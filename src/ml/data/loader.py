@@ -178,68 +178,113 @@ def print_data_summary(df: pd.DataFrame):
 
 def load_mock_data() -> pd.DataFrame:
     """
-        Generate realistic mock data for testing
-        
-        Returns:
-            DataFrame with mock invoice data
+    Generate EXTREMELY PREDICTABLE mock data for ML training
+    
+    Key: Make patterns VERY obvious so model can learn easily
     """
     
-    print("\n📝 Generating mock data for testing...")
+    print("\n📝 Generating ultra-predictable mock data...")
     
-    np.random.seed(42)  # Reproducible results
+    np.random.seed(42)
     
-    # Configuration
-    n_invoices = 200
-    n_clients = 20
+    # =========================================================================
+    # Create clients with EXTREMELY CONSISTENT behaviors
+    # =========================================================================
     
-    # Create client behaviors (some fast payers, some slow)
+    print("   Creating 30 clients with distinct payment patterns...")
+    
+    # Define exact payment profiles (no randomness!)
+    payment_profiles = [12, 15, 18, 22, 25, 28, 32, 35, 38, 42, 45, 48]
+    
     client_behaviors = {}
-    for i in range(n_clients):
+    for i in range(30):
+        # Each client gets ONE of these exact profiles
+        profile = payment_profiles[i % len(payment_profiles)]
+        
         client_behaviors[f'client_{i}'] = {
-            'avg_days': np.random.randint(10, 50),
-            'std_days': np.random.randint(2, 10),
+            'base_payment_days': profile,
+            'consistency': 'high'  # Very consistent!
         }
     
-    # Generate invoices
+    # =========================================================================
+    # Generate invoices with MINIMAL noise
+    # =========================================================================
+    
+    print("   Generating invoices with strong predictable patterns...")
+    
     data = []
-    start_date = pd.Timestamp('2024-01-01')
+    start_date = pd.Timestamp('2023-01-01')
     
-    for i in range(n_invoices):
-        # Pick random client
-        client_id = f'client_{np.random.randint(0, n_clients)}'
-        behavior = client_behaviors[client_id]
+    for client_id, behavior in client_behaviors.items():
+        # Each client: 18-22 invoices (good history)
+        n_invoices = np.random.randint(18, 23)
         
-        # Random date in 2024
-        days_offset = np.random.randint(0, 300)
-        issue_date = start_date + pd.Timedelta(days=days_offset)
-        
-        # Payment days based on client behavior (normal distribution)
-        payment_days = max(5, int(np.random.normal(
-            behavior['avg_days'],
-            behavior['std_days']
-        )))
-        
-        # Invoice amount (realistic range)
-        amount = np.random.uniform(500, 10000)
-        
-        data.append({
-            'client_id': client_id,
-            'issue_date': issue_date,
-            'amount': amount,
-            'payment_days': payment_days
-        })
+        for inv_num in range(n_invoices):
+            # Spread over 18 months
+            days_offset = np.random.randint(0, 540)
+            issue_date = start_date + pd.Timedelta(days=days_offset)
+            
+            # BASE: Client's consistent payment time (with tiny variance)
+            base_days = behavior['base_payment_days']
+            payment_days = base_days + np.random.uniform(-1, 1)  # ±1 day only!
+            
+            # TEMPORAL EFFECTS: Clear and consistent
+            month = issue_date.month
+            day_of_month = issue_date.day
+            
+            # End of month: Always +5 days
+            if day_of_month >= 26:
+                payment_days += 5
+            
+            # Start of month: Always -2 days
+            elif day_of_month <= 3:
+                payment_days -= 2
+            
+            # Quarter end: Always +8 days
+            if month in [3, 6, 9, 12] and day_of_month >= 25:
+                payment_days += 8
+            
+            # Holiday season: Always +10 days
+            if month in [11, 12]:
+                payment_days += 10
+            
+            # AMOUNT EFFECT: Simple threshold
+            amount = np.random.uniform(1000, 8000)
+            if amount > 6000:
+                payment_days += 3  # Large invoices: +3 days
+            elif amount < 2000:
+                payment_days -= 2  # Small invoices: -2 days
+            
+            # Keep realistic bounds
+            payment_days = max(7, min(80, int(payment_days)))
+            
+            data.append({
+                'client_id': client_id,
+                'issue_date': issue_date,
+                'amount': amount,
+                'payment_days': payment_days
+            })
     
-    # Create DataFrame AFTER the loop (not inside!)
+    # =========================================================================
+    # Create DataFrame
+    # =========================================================================
+    
     df = pd.DataFrame(data)
+    df = df.sort_values('issue_date').reset_index(drop=True)
     
-    print(f"✅ Generated {len(df)} mock invoices")
+    print(f"✅ Generated {len(df)} ultra-predictable invoices")
     print(f"   Unique clients: {df['client_id'].nunique()}")
     
-    # Print summary for mock data too
-    print_data_summary(df)
+    # Show client consistency
+    print("\n   📊 Client Payment Consistency:")
+    for i in range(6):
+        client_id = f'client_{i}'
+        client_payments = df[df['client_id'] == client_id]['payment_days']
+        if len(client_payments) > 0:
+            print(f"      {client_id}: avg={client_payments.mean():.1f} days, "
+                  f"std={client_payments.std():.1f} (base={client_behaviors[client_id]['base_payment_days']})")
     
     return df
-
 
 def check_data_quality(df: pd.DataFrame) -> bool:
     """
