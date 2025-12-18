@@ -98,18 +98,23 @@ else:
 # ============================================================================
 print("\n🤖 Training Random Forest model...")
 
-model = RandomForestRegressor(  # ← FIXED SPELLING! ✅
-    n_estimators=100,        # Number of trees
-    max_depth=15,            # Max tree depth
-    min_samples_split=5,     # Minimum samples to split
-    min_samples_leaf=2,      # Minimum samples in leaf
+model = RandomForestRegressor(
+    n_estimators=200,        # More trees
+    max_depth=8,             # Shallower (less overfitting)
+    min_samples_split=10,    # More conservative
+    min_samples_leaf=5,      # Smoother predictions
+    max_features='sqrt',     # Feature sampling
     random_state=42,
-    n_jobs=-1                # Use all CPU cores
+    n_jobs=-1
 )
 
 model.fit(X_train, y_train)
 
 print("✅ Model trained successfully!")
+
+# Show out-of-bag score (another validation metric)
+if hasattr(model, 'oob_score_'):
+    print(f"   Out-of-bag R²: {model.oob_score_:.4f}")
 
 
 # ============================================================================
